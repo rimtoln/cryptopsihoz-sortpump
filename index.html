@@ -173,10 +173,10 @@ function render(T0){const t=wrapT(T0),u=t/LOOP*TAU;c.setTransform(K,0,0,K,0,0);c
  const rate=passed+blocked?passed/(passed+blocked)*100:0;Rc(852,sy,212,sh,col.panel,col.line);T('PASS RATE · 20s',866,sy+24,11,col.dim,'700');T(rate.toFixed(0)+'%',866,sy+66,32,rate<40?col.red:col.green,'700','left',SANS);
  Rc(866,sy+76,184,8,'#140807','#3a1a16');Rc(867,sy+77,182*rate/100,6,'#5fc683');
  Ln(16,1314.5,1064,1314.5,col.line);T('@cryptopsihoz',24,1340,20,col.red,'700');T('ILLUSTRATIVE · TICKERS ARE FICTIONAL · NOT ADVICE',220,1337,11,col.dim);
- window.__sieve.t=t}
+ window.__sortpump.t=t}
 
 let time=0,last=null,paused=false;
-window.__sieve={render:t=>{time=t;render(t)},pause:v=>{paused=v},t:0};
+window.__sortpump={render:t=>{time=t;render(t)},pause:v=>{paused=v},t:0};
 function resize(){const r=frame.getBoundingClientRect(),dpr=Math.min(window.devicePixelRatio||1,3);K=r.width*dpr/W;cv.width=Math.round(W*K);cv.height=Math.round(H*K);
  document.getElementById('ctl').style.fontSize=(11*r.width/W)+'px';buildBg();render(time)}
 function tick(now){if(last===null)last=now;const dt=Math.min(.08,(now-last)/1000);last=now;if(!paused)time+=dt;render(time);requestAnimationFrame(tick)}

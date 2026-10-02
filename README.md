@@ -1,14 +1,81 @@
 # SortPump
 
-Animated terminal by [@cryptopsihoz](https://x.com/cryptopsihoz): how a scanner sorts new pump.fun mints into quality and trash.
+**Анимированный терминал, который показывает, как новые токены pump.fun сортируются на качественные и мусор — до того, как ты в них зайдёшь.**
 
-- New mints drop into a scanner that reads dev share, LP, bundles and mint authority.
-- Clean mints circle the QUALITY ring through four checks (LP, DEV, HOLD, BNDL) and reach the watchlist.
-- Rugs go to the TRASH ring and end up in the rug bin. Some pass the scanner and fail inside.
+by [@cryptopsihoz](https://x.com/cryptopsihoz) · [Live demo](https://rimtoln.github.io/cryptopsihoz-sortpump/) · [Видео MP4](media/sortpump-overview.mp4)
 
-Live demo: https://rimtoln.github.io/cryptopsihoz-sortpump/
+## Видеообзор
 
-Single standalone HTML, no dependencies. Frame 1080x1350 (4:5), 32 s seamless loop.
-Controls: Space - pause, F - fullscreen.
+[![SortPump — видеообзор](media/sortpump-preview.gif)](media/sortpump-overview.mp4)
 
-Illustrative only. Tickers are fictional. Not financial advice.
+*Превью играет прямо здесь. Клик — полное видео 1080×1350, 32 с, 30 fps.*
+
+---
+
+## Идея
+
+На pump.fun запускаются тысячи токенов в день, и большая часть — мусор: дев держит треть саппли, кошельки забандлены, mint authority не отозван, ликвидность не сожжена. SortPump — наглядная схема фильтра, который отсекает это до покупки.
+
+Формат взят из explainer-роликов про инфраструктуру: поток точек, узел-распределитель, два кольца-обработчика, корзина и камера, которая наезжает на каждый этап.
+
+## Что происходит в кадре
+
+1. **NEW MINTS · PUMP.FUN** — новый минт каждые 0.8 с падает в сканер.
+2. **SCANNER** — читает контракт: доля дева, LP, бандлы, mint authority. Стрелка уходит влево (CLEAN) или вправо (RUG).
+3. **QUALITY** — чистые токены облетают кольцо через 4 проверки: `LP · DEV · HOLD · BNDL`. Счётчик `INSIDE` — сколько сейчас на проверке.
+4. **TRASH** — раги идут в красное кольцо.
+5. **FAILED INSIDE** — часть токенов проходит сканер, но краснеет на проверке (`FAIL · DEV SOLD`) и улетает в корзину. Главный поворот ролика: первого фильтра мало.
+6. **WATCHLIST · PASSED** → **TRADERS** — до трейдеров доходят только чистые.
+7. **RUG BIN · BLOCKED** — заблокированные падают в корзину и тают.
+
+| Общий план | Кольцо QUALITY | RUG BIN |
+|---|---|---|
+| ![](media/poster-overview.jpg) | ![](media/poster-quality-ring.jpg) | ![](media/poster-rug-bin.jpg) |
+
+## Цифры
+
+| | |
+|---|---|
+| Цикл | 32 с, бесшовный |
+| Токенов за цикл | 40 |
+| Мусора | ~64% |
+| Проваливаются внутри | ~30% прошедших сканер |
+| Проверок в кольце | 4 |
+| Планов камеры | 6 |
+| Кадр | 1080×1350 (4:5) |
+| Производительность | 60 fps, ~0.6 мс/кадр |
+| Зависимости | ноль, один HTML-файл |
+
+## Запуск
+
+- Онлайн: **https://rimtoln.github.io/cryptopsihoz-sortpump/**
+- Офлайн: скачай `index.html` и открой двойным кликом.
+
+**Управление:** `Пробел` — пауза, `F` — полный экран (на 1920×1080 кадр занимает 864×1080 по центру).
+
+## Структура
+
+```
+index.html                 — терминал (то же, что live demo)
+versions/SORTPUMP-v01.html — зафиксированные версии
+media/                     — видео, превью-GIF, кадры
+docs/HOW-IT-WORKS.md       — как устроена анимация: время, токены, камера, панели
+docs/CUSTOMIZE.md          — какие константы менять под себя
+tools/capture/             — покадровая запись видео (Python + ffmpeg)
+CHANGELOG.md
+LICENSE
+```
+
+## Документация
+
+- [Как это работает](docs/HOW-IT-WORKS.md)
+- [Как поменять под себя](docs/CUSTOMIZE.md)
+- [Как записать видео](tools/capture/README.md)
+
+## Дисклеймер
+
+Это иллюстрация. Тикеры, проценты и вердикты выдуманы. Не финансовый совет.
+
+## Лицензия
+
+[MIT](LICENSE)
