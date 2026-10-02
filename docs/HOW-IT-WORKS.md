@@ -1,87 +1,87 @@
-# Как устроен SortPump
+# How SortPump works
 
-Весь проект — один HTML-файл: разметка, стили и ~200 строк JavaScript на Canvas 2D. Никаких библиотек, сборки и сетевых запросов.
+The whole app is one HTML file: markup, styles and ~200 lines of JavaScript on Canvas 2D. No libraries, no build step, no network requests.
 
-## 1. Время и цикл
+## 1. Time and loop
 
-- Анимация идёт через `requestAnimationFrame`, но всё рисуется из **времени в секундах**, а не из номера кадра. Скорость одинаковая на 60, 120 и 144 Гц.
-- Длина цикла `LOOP = 32` с. Любое состояние — это функция `render(t)`, где `t = t mod 32`. Кадр `t = 0` и кадр `t = 32` совпадают попиксельно (разница при проверке ≈ 0.12 из 255), поэтому видео можно крутить по кругу без шва.
-- Вращения колец кратны полному обороту за цикл, пунктир на проводах смещается на величину, кратную длине штриха.
+- Animation runs on `requestAnimationFrame`, but everything is computed from **time in seconds**, not frame count, so the speed is the same on 60, 120 and 144 Hz screens.
+- Loop length is `LOOP = 32` s. Every frame is a pure function `render(t)` with `t = t mod 32`. Frames at `t = 0` and `t = 32` match pixel for pixel (measured difference ≈ 0.12 of 255), so the video loops with no seam.
+- Ring rotations are whole turns per loop, and wire dash offsets are multiples of the dash length.
 
-## 2. Поток токенов
+## 2. Token stream
 
-| Параметр | Значение |
+| Parameter | Value |
 |---|---|
-| Токенов за цикл | 40 (`N`) |
-| Интервал появления | 0.8 с |
-| Доля мусора | ~64% |
-| «Проваливаются внутри» | ~30% от тех, кого сканер пропустил |
-| Время в кольце | 3.6–5.2 с |
-| Лежат в WATCHLIST | 12 с |
-| Лежат в RUG BIN | 16 с |
+| Mints per loop | 40 (`N`) |
+| Spawn interval | 0.8 s |
+| Trash share | ~64% |
+| Fail inside | ~30% of scanner passes |
+| Time in ring | 3.6–5.2 s |
+| Stay in WATCHLIST | 12 s |
+| Stay in RUG BIN | 16 s |
 
-Каждый токен детерминирован: тип, тикер, причина вердикта и место в корзине берутся из `hash(i)`. Случайных чисел в кадре нет — ничего не «дёргается».
+Each token is deterministic: type, ticker, verdict reason and bin position come from `hash(i)`. There is no per-frame randomness, so nothing jitters.
 
-Тикер собирается из двух частей (`PEPE` + `CAT` → `$PEPECAT`). Все тикеры выдуманы.
+Tickers are built from two parts (`PEPE` + `CAT` → `$PEPECAT`).
 
-## 3. Маршрут одного токена
+## 3. Route of one token
 
-Функция `tokState(token, t)` возвращает позицию и фазу по «возрасту» токена `a = t − spawn`:
+`tokState(token, t)` returns position and phase from the token age `a = t − spawn`:
 
-| Фаза | Возраст | Что происходит |
+| Phase | Age | What happens |
 |---|---|---|
-| `pipe` | 0–1.0 с | падает по проводу NEW MINTS |
-| `scan` | 1.0–1.4 с | стоит в сканере, цвет меняется на зелёный или красный |
-| `wire` | 1.4–2.4 с | едет по кривой Безье к своему кольцу |
-| `ring` | 2.4 с + 3.6–5.2 с | облетает кольцо, проходит 4 точки проверки |
-| `out` | 1 с | уходит в лоток, в корзину или по проводу FAILED INSIDE |
-| `tray` / `bin` | 12 / 16 с | лежит в WATCHLIST или падает в RUG BIN с отскоком, затем тает |
+| `pipe` | 0–1.0 s | falls down the NEW MINTS wire |
+| `scan` | 1.0–1.4 s | sits in the scanner and turns green or red |
+| `wire` | 1.4–2.4 s | travels along a Bézier curve to its ring |
+| `ring` | 2.4 s + 3.6–5.2 s | orbits the ring through 4 checkpoints |
+| `out` | 1 s | leaves for the tray, the bin or the FAILED INSIDE wire |
+| `tray` / `bin` | 12 / 16 s | rests in WATCHLIST, or drops into RUG BIN with a bounce, then fades |
 
-Токены «с подвохом» (`flip`) в середине круга плавно краснеют, получают метку `FAIL · DEV SOLD` и уходят в корзину по отдельному проводу.
+`flip` tokens turn red halfway through the ring, get a `FAIL · DEV SOLD` tag and leave for the bin on a separate wire.
 
-## 4. Узлы схемы
+## 4. Diagram nodes
 
-- **SCANNER** — стрелка плавно отклоняется к кольцу, куда идёт текущий токен; лампа слева (CLEAN) или справа (RUG) загорается.
-- **QUALITY / TRASH** — кольца с вращающимися сегментами, шкалой и пунктирной дорожкой. Счётчик `INSIDE` — реальное число токенов на дорожке в этот момент.
-- **Точки проверки** `LP · DEV · HOLD · BNDL` вспыхивают, когда через них проходит токен.
-- **WATCHLIST · PASSED** и **RUG BIN · BLOCKED** — счётчики за последние 20 секунд (скользящее окно, поэтому тоже без шва).
-- **TRADERS** — три лампы мигают, когда чистый токен доходит до лотка.
+- **SCANNER.** The needle eases toward the ring the current token is heading to. The CLEAN or RUG lamp lights up.
+- **QUALITY / TRASH.** Rings with rotating segments, a tick scale and a dotted track. `INSIDE` is the actual number of tokens on the track at that moment.
+- **Checkpoints** `LP · DEV · HOLD · BNDL` flash when a token passes them.
+- **WATCHLIST · PASSED** and **RUG BIN · BLOCKED** count arrivals over the last 20 s. It is a sliding window, so it loops without a seam too.
+- **TRADERS.** Three lamps blink when a clean token reaches the tray.
 
-## 5. Камера
+## 5. Camera
 
-Камера — масштаб + сдвиг всей схемы. Зум интерполируется логарифмически, а сдвиг подстроен так, чтобы наезд выглядел как одно движение, без «плавания».
+The camera scales and pans the whole diagram. Zoom is interpolated logarithmically, and the pan is matched to it so each move reads as one continuous push-in.
 
-| Время | План |
+| Time | Shot |
 |---|---|
-| 0–5 с | общий план |
-| 6.3–9.2 с | сканер, ×1.9 |
-| 10.5–15.2 с | кольцо QUALITY, ×1.7 |
-| 16.5–20.6 с | кольцо TRASH, ×1.7 |
-| 21.8–25.2 с | RUG BIN, ×1.9 |
-| 26.8–32 с | общий план |
+| 0–5 s | overview |
+| 6.3–9.2 s | scanner, ×1.9 |
+| 10.5–15.2 s | QUALITY ring, ×1.7 |
+| 16.5–20.6 s | TRASH ring, ×1.7 |
+| 21.8–25.2 s | RUG BIN, ×1.9 |
+| 26.8–32 s | overview |
 
-## 6. Подписи
+## 6. Captions
 
-Шесть подписей с цветными ключевыми словами и полоской прогресса. Каждая появляется и исчезает за 0.35 с.
+Six captions with colored keywords and a progress bar. Each fades in and out over 0.35 s.
 
-## 7. Нижние панели
+## 7. Stat panels
 
-| Панель | Что показывает |
+| Panel | Shows |
 |---|---|
-| LAST VERDICT | последний токен из сканера, вердикт и причина |
-| IN CHECK NOW | сколько токенов сейчас в кольцах |
-| AVG CHECK TIME | среднее время сканер + кольцо |
-| PASS RATE · 20s | доля прошедших за 20 с, полоска заполнения |
+| LAST VERDICT | latest token out of the scanner, its verdict and reason |
+| IN CHECK NOW | tokens currently in the rings |
+| AVG CHECK TIME | average scanner + ring time |
+| PASS RATE · 20s | share of passes over 20 s, with a fill bar |
 
-## 8. Производительность
+## 8. Performance
 
-- Фон с сеткой рисуется один раз в offscreen-canvas.
-- Учитывается `devicePixelRatio` (до ×3) — текст чёткий на любом экране.
-- Замер: 60 fps, ~0.6 мс на кадр.
+- The grid background is drawn once into an offscreen canvas.
+- `devicePixelRatio` is respected up to 3×, so text stays sharp.
+- Measured: 60 fps, ~0.6 ms per frame.
 
-## 9. Хуки для записи
+## 9. Hooks
 
 ```js
-window.__sortpump.pause(true);   // остановить
-window.__sortpump.render(12.5);  // нарисовать кадр на 12.5 с
+window.__sortpump.pause(true);   // stop the clock
+window.__sortpump.render(12.5);  // draw the frame at 12.5 s
 ```

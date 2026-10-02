@@ -2,8 +2,8 @@
 
 ## v01 — 2026-10-02
 
-- Схема NEW MINTS → SCANNER → QUALITY / TRASH → WATCHLIST / RUG BIN.
-- 40 детерминированных токенов за 32-секундный бесшовный цикл.
-- 4 точки проверки в кольце, токены «FAILED INSIDE».
-- Камера с 6 планами, 6 подписей, 4 нижние панели.
-- Видеообзор, превью-GIF, документация, инструмент покадровой записи.
+- Pipeline NEW MINTS → SCANNER → QUALITY / TRASH → WATCHLIST / RUG BIN.
+- 40 deterministic mints in a seamless 32 s loop.
+- 4 checkpoints per ring and FAILED INSIDE tokens.
+- Scripted camera with 6 shots, 6 captions, 4 stat panels.
+- Video overview, preview GIF, docs and frame-perfect capture tools.

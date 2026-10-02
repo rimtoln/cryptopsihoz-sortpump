@@ -1,81 +1,95 @@
 # SortPump
 
-**Анимированный терминал, который показывает, как новые токены pump.fun сортируются на качественные и мусор — до того, как ты в них зайдёшь.**
+**A real-time visual sorter for pump.fun launches: every new mint is scanned, routed into a QUALITY or TRASH ring, run through on-chain checks and delivered either to the watchlist or to the rug bin.**
 
-by [@cryptopsihoz](https://x.com/cryptopsihoz) · [Live demo](https://rimtoln.github.io/cryptopsihoz-sortpump/) · [Видео MP4](media/sortpump-overview.mp4)
+by [@cryptopsihoz](https://x.com/cryptopsihoz) · [Live demo](https://rimtoln.github.io/cryptopsihoz-sortpump/) · [Full video (MP4)](media/sortpump-overview.mp4)
 
-## Видеообзор
+## Video overview
 
-[![SortPump — видеообзор](media/sortpump-preview.gif)](media/sortpump-overview.mp4)
+[![SortPump video overview](media/sortpump-overview-preview.gif)](media/sortpump-overview.mp4)
 
-*Превью играет прямо здесь. Клик — полное видео 1080×1350, 32 с, 30 fps.*
+*The preview plays inline. Click it for the full 1080×1350 video (32 s, 30 fps).*
 
 ---
 
-## Идея
+## Why SortPump
 
-На pump.fun запускаются тысячи токенов в день, и большая часть — мусор: дев держит треть саппли, кошельки забандлены, mint authority не отозван, ликвидность не сожжена. SortPump — наглядная схема фильтра, который отсекает это до покупки.
+Thousands of tokens launch on pump.fun every day, and most of them are built to drain buyers: the dev holds a third of the supply, wallets are bundled, mint authority is still live, liquidity is not burned. SortPump turns the filtering pipeline into one clear animated scene, so anyone can see in 30 seconds what gets cut before a buy and why one scan is not enough.
 
-Формат взят из explainer-роликов про инфраструктуру: поток точек, узел-распределитель, два кольца-обработчика, корзина и камера, которая наезжает на каждый этап.
+It ships as a single HTML file, so you can open it in a browser, record it, post it, or put it on a stream.
 
-## Что происходит в кадре
+## How the pipeline works
 
-1. **NEW MINTS · PUMP.FUN** — новый минт каждые 0.8 с падает в сканер.
-2. **SCANNER** — читает контракт: доля дева, LP, бандлы, mint authority. Стрелка уходит влево (CLEAN) или вправо (RUG).
-3. **QUALITY** — чистые токены облетают кольцо через 4 проверки: `LP · DEV · HOLD · BNDL`. Счётчик `INSIDE` — сколько сейчас на проверке.
-4. **TRASH** — раги идут в красное кольцо.
-5. **FAILED INSIDE** — часть токенов проходит сканер, но краснеет на проверке (`FAIL · DEV SOLD`) и улетает в корзину. Главный поворот ролика: первого фильтра мало.
-6. **WATCHLIST · PASSED** → **TRADERS** — до трейдеров доходят только чистые.
-7. **RUG BIN · BLOCKED** — заблокированные падают в корзину и тают.
+1. **NEW MINTS · PUMP.FUN.** A fresh mint drops into the scanner every 0.8 s.
+2. **SCANNER.** Reads the contract: dev share, LP, bundles and mint authority. The needle swings left to CLEAN or right to RUG.
+3. **QUALITY ring.** Clean mints orbit through four checks: `LP · DEV · HOLD · BNDL`. The `INSIDE` counter shows how many are being checked right now.
+4. **TRASH ring.** Rugs are routed to the red ring.
+5. **FAILED INSIDE.** Some mints pass the scanner but turn red mid-check (`FAIL · DEV SOLD`) and are ejected to the bin. This is the key point: the first filter is not enough.
+6. **WATCHLIST · PASSED → TRADERS.** Only mints that pass every check reach the traders.
+7. **RUG BIN · BLOCKED.** Blocked mints drop into the bin and dissolve.
 
-| Общий план | Кольцо QUALITY | RUG BIN |
+| Overview | QUALITY ring | RUG BIN |
 |---|---|---|
 | ![](media/poster-overview.jpg) | ![](media/poster-quality-ring.jpg) | ![](media/poster-rug-bin.jpg) |
 
-## Цифры
+## Features
+
+- Scripted camera with 6 shots: overview, scanner, QUALITY ring, TRASH ring, rug bin, back to overview.
+- 6 on-screen captions with highlighted keywords and a progress bar.
+- 4 live stat panels: LAST VERDICT, IN CHECK NOW, AVG CHECK TIME, PASS RATE · 20s.
+- Deterministic token stream, so every playback and every recording is identical.
+- Seamless 32 s loop: the last frame flows into the first with no jump.
+- Sharp on any screen: respects `devicePixelRatio` up to 3×.
+- Zero dependencies: one HTML file that works offline.
+
+## Specs
 
 | | |
 |---|---|
-| Цикл | 32 с, бесшовный |
-| Токенов за цикл | 40 |
-| Мусора | ~64% |
-| Проваливаются внутри | ~30% прошедших сканер |
-| Проверок в кольце | 4 |
-| Планов камеры | 6 |
-| Кадр | 1080×1350 (4:5) |
-| Производительность | 60 fps, ~0.6 мс/кадр |
-| Зависимости | ноль, один HTML-файл |
+| Loop | 32 s, seamless |
+| Mints per loop | 40 |
+| Trash share | ~64% |
+| Fail inside | ~30% of scanner passes |
+| Checks per ring | 4 |
+| Camera shots | 6 |
+| Frame | 1080×1350 (4:5) |
+| Performance | 60 fps, ~0.6 ms per frame |
+| Dependencies | none |
 
-## Запуск
+## Quick start
 
-- Онлайн: **https://rimtoln.github.io/cryptopsihoz-sortpump/**
-- Офлайн: скачай `index.html` и открой двойным кликом.
+- **Online:** open **https://rimtoln.github.io/cryptopsihoz-sortpump/**
+- **Offline:** download `index.html` and double-click it.
 
-**Управление:** `Пробел` — пауза, `F` — полный экран (на 1920×1080 кадр занимает 864×1080 по центру).
+**Controls:** `Space` pauses, `F` toggles fullscreen. On a 1920×1080 monitor the fullscreen frame is 864×1080, centered at x 528–1392.
 
-## Структура
+## Record your own video
+
+There are two ways to record, both described step by step in **[docs/RECORDING.md](docs/RECORDING.md)**:
+
+1. **Screen recording (OBS, 5 minutes).** Open the demo, press `F`, record one 32 s loop.
+2. **Frame-perfect render (Python + ffmpeg).** Renders all 960 frames at exactly 1080×1350 and encodes MP4 and GIF. This is how the video above was made.
+
+## Project structure
 
 ```
-index.html                 — терминал (то же, что live demo)
-versions/SORTPUMP-v01.html — зафиксированные версии
-media/                     — видео, превью-GIF, кадры
-docs/HOW-IT-WORKS.md       — как устроена анимация: время, токены, камера, панели
-docs/CUSTOMIZE.md          — какие константы менять под себя
-tools/capture/             — покадровая запись видео (Python + ffmpeg)
+index.html                 the app (same file as the live demo)
+versions/SORTPUMP-v01.html frozen releases
+media/                     overview video, preview GIF, stills
+docs/HOW-IT-WORKS.md       timing, token routing, camera, panels
+docs/CUSTOMIZE.md          constants to change tickers, odds, camera, captions, colors
+docs/RECORDING.md          how to record the video yourself
+tools/capture/             capture server and browser script
 CHANGELOG.md
 LICENSE
 ```
 
-## Документация
+## Documentation
 
-- [Как это работает](docs/HOW-IT-WORKS.md)
-- [Как поменять под себя](docs/CUSTOMIZE.md)
-- [Как записать видео](tools/capture/README.md)
+- [How it works](docs/HOW-IT-WORKS.md)
+- [Customize](docs/CUSTOMIZE.md)
+- [Record your own video](docs/RECORDING.md)
 
-## Дисклеймер
-
-Это иллюстрация. Тикеры, проценты и вердикты выдуманы. Не финансовый совет.
-
-## Лицензия
+## License
 
 [MIT](LICENSE)

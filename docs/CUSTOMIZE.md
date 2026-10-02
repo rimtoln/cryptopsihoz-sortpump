@@ -1,22 +1,22 @@
-# Как поменять под себя
+# Customize
 
-Все настройки — константы в начале `<script>` в `index.html`.
+All settings are constants at the top of the `<script>` in `index.html`.
 
-| Что | Где | Пример |
+| What | Where | Example |
 |---|---|---|
-| Длина цикла | `LOOP` | `32` |
-| Сколько токенов за цикл | `N` | `40` |
-| Доля мусора | `hash(i*3.1)<.64` | `.5` — половина мусор |
-| Доля «провалились внутри» | `hash(i*5.7+2)<.3` | `.15` |
-| Части тикеров | `PRE`, `SUF` | свои мемы |
-| Причины блокировки | `BAD_WHY` | `'DEV 41% SUPPLY'` |
-| Причины одобрения | `GOOD_WHY` | `'LP BURNED · DEV 2%'` |
-| Точки проверки | `CHECKS` | `[['LP',-20],['DEV',70],…]` (название, угол) |
-| План камеры | `KEYS` | `[время, [x, y, зум]]` |
-| Подписи | `CAPS` | `[старт, конец, [[текст, 0/1/2]]]`, 1 — зелёный, 2 — красный |
-| Цвета | `col` | `green`, `red`, `mint`… |
-| Хэндл | в `render()` | `'@cryptopsihoz'` |
+| Loop length | `LOOP` | `32` |
+| Mints per loop | `N` | `40` |
+| Trash share | `hash(i*3.1)<.64` | `.5` for half trash |
+| Fail-inside share | `hash(i*5.7+2)<.3` | `.15` |
+| Ticker parts | `PRE`, `SUF` | your own memes |
+| Block reasons | `BAD_WHY` | `'DEV 41% SUPPLY'` |
+| Pass reasons | `GOOD_WHY` | `'LP BURNED · DEV 2%'` |
+| Checkpoints | `CHECKS` | `[['LP',-20],['DEV',70],…]` (name, angle) |
+| Camera plan | `KEYS` | `[time, [x, y, zoom]]` |
+| Captions | `CAPS` | `[start, end, [[text, 0/1/2]]]`, 1 = green, 2 = red |
+| Colors | `col` | `green`, `red`, `mint`… |
+| Handle | in `render()` | `'@cryptopsihoz'` |
 
-После изменений проверь шов: кадры `render(0)` и `render(LOOP - 0.0001)` должны совпадать.
+After changes, check the seam: `render(0)` and `render(LOOP - 0.0001)` must match.
 
-Новые версии сохраняй как `versions/SORTPUMP-v02.html` и т.д., старые не перезаписывай.
+Save new releases as `versions/SORTPUMP-v02.html` and so on, without overwriting earlier ones.
